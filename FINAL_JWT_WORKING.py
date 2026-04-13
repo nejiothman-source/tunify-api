@@ -1,4 +1,3 @@
-
 from fastapi import FastAPI, Depends, HTTPException
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from fastapi.middleware.cors import CORSMiddleware
@@ -10,9 +9,6 @@ from datetime import datetime, timedelta
 
 app = FastAPI()
 
-@app.get("/")
-def home():
-    return {"message": "API is running"}
 # 🔥 ADD THIS (CORS FIX)
 app.add_middleware(
     CORSMiddleware,
