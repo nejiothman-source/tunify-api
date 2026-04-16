@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>My App</title>
+</head>
+<body>
+
+<h2>Signup</h2>
+<input id="su_user" placeholder="username">
+<input id="su_pass" placeholder="password">
+<button onclick="signup()">Signup</button>
+
+<h2>Login</h2>
+<input id="li_user" placeholder="username">
+<input id="li_pass" placeholder="password">
+<button onclick="login()">Login</button>
+
+<h2>Add Item</h2>
+<input id="item_name" placeholder="name">
+<input id="item_price" placeholder="price">
+<button onclick="addItem()">Add</button>
+
+<button onclick="loadItems()">Load Items</button>
+<ul id="items_list"></ul>
+
+<script>
+let token = "";
+
+async function signup() {
+  const res = await fetch("http://127.0.0.1:8000/signup", {
+    method: "POST",
+    headers: {"Content-Type": "application/json"},
+    body: JSON.stringify({
+      username: document.getElementById("su_user").value,
+      password: document.getElementById("su_pass").value
+    })
+  });
+  alert("User created");
+}
+
+async function login() {
+  const res = await fetch("http://127.0.0.1:8000/login", {
+    method: "POST",
+    headers: {"Content-Type": "application/json"},
+    body: JSON.stringify({
+      username: document.getElementById("li_user").value,
+      password: document.getElementById("li_pass").value
+    })
+  });
+  const data = await res.json();
+  token = data.access_token;
+  alert("Logged in");
+}
+
+async function addItem() {
+  await fetch("http://127.0.0.1:8000/items", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": "Bearer " + token
+    },
+    body: JSON.stringify({
+      name: document.getElementById("item_name").value,
+      price: Number(document.getElementById("item_price").value)
+    })
+  });
+  alert("Item added");
+}
+
+async function loadItems() {
+  const res = await fetch("http://127.0.0.1:8000/items", {
+    headers: {
+      "Authorization": "Bearer " + token
+    }
+  });
+
+  const data = await res.json();
+
+  const list = document.getElementById("items_list");
+  list.innerHTML = "";
+
+  data.forEach(item => {
+    const li = document.createElement("li");
+    li.innerText = item.name + " - $" + item.price;
+    list.appendChild(li);
+  });
+}
+</script>
+
+</body>
+</html>
