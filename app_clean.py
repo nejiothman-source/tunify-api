@@ -18,7 +18,12 @@ app.add_middleware(
 engine = create_engine("sqlite:///./test.db", connect_args={"check_same_thread": False})
 SessionLocal = sessionmaker(bind=engine)
 Base = declarative_base()
+class User(Base):
+    __tablename__ = "users"
 
+    id = Column(Integer, primary_key=True)
+    username = Column(String, unique=True)
+    password = Column(String)
 class Item(Base):
     __tablename__ = "items"
     id = Column(Integer, primary_key=True, index=True)
@@ -29,6 +34,9 @@ Base.metadata.create_all(bind=engine)
 
 class Prompt(BaseModel):
     prompt: str
+class UserCreate(BaseModel):
+    username: str
+    password: str
 @app.post("/agent")
 def agent(data: Prompt):
     db = SessionLocal()
@@ -56,3 +64,25 @@ def get_ideas():
     return {
         "ideas": [{"id": item.id, "idea": item.name} for item in items]
     }
+@app.post("/signup")
+def signup(user: UserCreate):
+    db = SessionLocal()
+
+    new_user = User(username=user.username, password=user.password)
+    db.add(new_user)
+    db.commit()
+
+    return {"message": "User created"}
+@app.post("/login")
+def login(user: UserCreate):
+    db = SessionLocal()
+
+    existing = db.query(User).filter(
+        User.username == user.username,
+        User.password == user.password
+    ).first()
+
+    if not existing:
+        return {"error": "Invalid credentials"}
+
+    return {"message": "Login success"}
