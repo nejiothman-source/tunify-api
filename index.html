@@ -1,15 +1,73 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>AI App</title>
+  <title>Tunicore AI</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial;
+      background: linear-gradient(135deg, #111, #1e1e1e);
+      color: white;
+      text-align: center;
+      padding: 50px;
+    }
+
+    h1 {
+      font-size: 40px;
+      margin-bottom: 10px;
+    }
+
+    input {
+      padding: 12px;
+      width: 300px;
+      border-radius: 8px;
+      border: none;
+      margin-top: 20px;
+    }
+
+    button {
+      padding: 12px 20px;
+      margin: 10px;
+      border: none;
+      border-radius: 8px;
+      background: #4CAF50;
+      color: white;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    button:hover {
+      background: #45a049;
+    }
+
+    #result {
+      margin-top: 20px;
+      font-size: 18px;
+    }
+
+    #ideas {
+      margin-top: 20px;
+      list-style: none;
+      padding: 0;
+    }
+
+    #ideas li {
+      background: #222;
+      margin: 5px;
+      padding: 10px;
+      border-radius: 6px;
+    }
+  </style>
 </head>
+
 <body>
 
-<h1>AI App Generator</h1>
+<h1>🚀 Tunicore AI</h1>
+<p>Turn ideas into apps instantly</p>
 
-<input id="prompt" type="text" placeholder="Enter idea" />
+<input id="prompt" placeholder="Enter your idea..." />
 
-<br><br>
+<br>
 
 <button onclick="generate()">Generate</button>
 <button onclick="loadIdeas()">Show Ideas</button>
@@ -21,29 +79,22 @@
 async function generate() {
     const prompt = document.getElementById("prompt").value;
 
-    const resultBox = document.getElementById("result");
-    resultBox.innerText = "Loading...";
+    document.getElementById("result").innerText = "Generating...";
 
-    try {
-        const res = await fetch("https://tunify-api.onrender.com/agent ", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({ prompt: prompt })
-        });
+    const res = await fetch("https://tunify-api-1.onrender.com/agent", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ prompt })
+    });
 
-        const data = await res.json();
-        resultBox.innerText = data.result;
-
-    } catch (error) {
-        console.error(error);
-        resultBox.innerText = "Error connecting to backend";
-    }
+    const data = await res.json();
+    document.getElementById("result").innerText = data.result;
 }
 
 async function loadIdeas() {
-    const res = await fetch("https://tunify-api.onrender.com/ideas ");
+    const res = await fetch("https://tunify-api-1.onrender.com/ideas");
     const data = await res.json();
 
     const list = document.getElementById("ideas");

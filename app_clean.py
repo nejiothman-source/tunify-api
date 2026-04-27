@@ -1,3 +1,5 @@
+from openai import OpenAI
+client = OpenAI()
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
@@ -27,26 +29,25 @@ Base.metadata.create_all(bind=engine)
 
 class Prompt(BaseModel):
     prompt: str
-
 @app.post("/agent")
 def agent(data: Prompt):
     db = SessionLocal()
 
-    idea = data.prompt.lower()
+    response = client.chat.completions.create(
+        model="gpt-4.1-mini",
+        messages=[
+            {"role": "system", "content": "You are a startup idea generator."},
+            {"role": "user", "content": data.prompt}
+        ]
+    )
 
-    if "fitness" in idea:
-        result = "Build a fitness app with workouts."
-    elif "food" in idea:
-        result = "Create a food delivery app."
-    else:
-        result = f"Build an app based on: {data.prompt}"
+    result = response.choices[0].message.content
 
     new_item = Item(name=data.prompt, price=0)
     db.add(new_item)
     db.commit()
 
     return {"result": result}
-
 @app.get("/ideas")
 def get_ideas():
     db = SessionLocal()
