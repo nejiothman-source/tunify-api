@@ -1,23 +1,28 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>AI App Builder</title>
+    <title>AI App</title>
 </head>
 <body>
 
-<h2>AI App Builder</h2>
+<h1>AI App Generator</h1>
 
-<input id="prompt" placeholder="Describe your app idea..." style="width:300px;" />
+<input id="prompt" type="text" placeholder="Enter idea" />
+
+<br><br>
 
 <button onclick="generate()">Generate</button>
+<button onclick="loadIdeas()">Show Ideas</button>
 
 <p id="result"></p>
+<ul id="ideas"></ul>
 
 <script>
 async function generate() {
     const prompt = document.getElementById("prompt").value;
 
-    console.log("Sending:", prompt);
+    const resultBox = document.getElementById("result");
+    resultBox.innerText = "Loading...";
 
     try {
         const res = await fetch("http://127.0.0.1:8000/agent", {
@@ -25,20 +30,30 @@ async function generate() {
             headers: {
                 "Content-Type": "application/json"
             },
-            body: JSON.stringify({
-                prompt: prompt
-            })
+            body: JSON.stringify({ prompt: prompt })
         });
 
-        console.log("Status:", res.status);
-
         const data = await res.json();
-        console.log("Data:", data);
+        resultBox.innerText = data.result;
 
-        document.getElementById("result").innerText = data.result;
     } catch (error) {
-        console.error("ERROR:", error);
+        console.error(error);
+        resultBox.innerText = "Error connecting to backend";
     }
+}
+
+async function loadIdeas() {
+    const res = await fetch("http://127.0.0.1:8000/ideas");
+    const data = await res.json();
+
+    const list = document.getElementById("ideas");
+    list.innerHTML = "";
+
+    data.ideas.forEach(item => {
+        const li = document.createElement("li");
+        li.innerText = item.idea;
+        list.appendChild(li);
+    });
 }
 </script>
 

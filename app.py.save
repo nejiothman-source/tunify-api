@@ -45,7 +45,9 @@ class ItemDB(Base):
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String)
     price = Column(Float)
-
+class ItemCreate(BaseModel):
+    name: str
+    price: float
 class UserDB(Base):
     __tablename__ = "users"
     id = Column(Integer, primary_key=True, index=True)
@@ -107,7 +109,7 @@ def login(user: User):
     return {"access_token": token}
 
 @app.post("/items")
-def create_item(item: Item, user: str = Depends(verify_token)):
+def create_item(item: ItemCreate, user: str = Depends(verify_token)):
     db = SessionLocal()
     db_item = ItemDB(name=item.name, price=item.price)
     db.add(db_item)
