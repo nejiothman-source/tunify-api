@@ -64,7 +64,17 @@
 
 <h1>🚀 Tunicore AI</h1>
 <p>Turn ideas into apps instantly</p>
+<h2>Account</h2>
 
+<input id="username" placeholder="Username" />
+<input id="password" type="password" placeholder="Password" />
+
+<br>
+
+<button onclick="signup()">Sign Up</button>
+<button onclick="login()">Login</button>
+
+<p id="authResult"></p>
 <input id="prompt" placeholder="Enter your idea..." />
 
 <br>
@@ -77,6 +87,39 @@
 
 <script>
 async function generate() {
+<script>
+async function signup() {
+    const username = document.getElementById("username").value;
+    const password = document.getElementById("password").value;
+
+    const res = await fetch("https://tunify-api-1.onrender.com/signup", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ username, password })
+    });
+
+    const data = await res.json();
+    document.getElementById("authResult").innerText = data.message || data.error;
+}
+
+async function login() {
+    const username = document.getElementById("username").value;
+    const password = document.getElementById("password").value;
+
+    const res = await fetch("https://tunify-api-1.onrender.com/login", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ username, password })
+    });
+
+    const data = await res.json();
+    document.getElementById("authResult").innerText = data.message || data.error;
+}
+</script>
     const prompt = document.getElementById("prompt").value;
 
     document.getElementById("result").innerText = "Generating...";
@@ -90,8 +133,8 @@ async function generate() {
     });
 
     const data = await res.json();
-    document.getElementById("result").innerText = data.result;
-}
+document.getElementById("result").innerHTML =
+    data.result.replace(/\n/g, "<br>");}
 
 async function loadIdeas() {
     const res = await fetch("https://tunify-api-1.onrender.com/ideas");

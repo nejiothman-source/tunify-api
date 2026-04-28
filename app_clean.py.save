@@ -36,46 +36,7 @@ class Prompt(BaseModel):
     prompt: str
 class UserCreate(BaseModel):
     username: str
-    password: st
-@app.post("/agent")
-def agent(data: Prompt):
-    db = SessionLocal()
-
-    try:
-        response = client.chat.completions.create(
-            model="gpt-4.1-mini",
-            messages=[
-                {
-                    "role": "system",
-                    "content": """You are a startup builder AI.
-
-Generate a FULL startup plan with:
-- Startup Name
-- Idea Description
-- Target Users
-- Features
-- Monetization
-- Tech Stack
-- MVP Plan"""
-                },
-                {
-                    "role": "user",
-                    "content": data.prompt
-                }
-            ]
-        )
-
-        result = response.choices[0].message.content
-
-    except Exception as e:
-        result = "ERROR: " + str(e)
-
-    new_item = Item(name=data.prompt, price=0)
-    db.add(new_item)
-    db.commit()
-
-    return {"result": result}r
-@app.get("/ideas")
+    password: str
 def get_ideas():
     db = SessionLocal()
     items = db.query(Item).all()
