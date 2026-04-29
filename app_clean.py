@@ -1,5 +1,4 @@
 import os
-from openai import OpenAI
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
@@ -42,25 +41,21 @@ def agent(data: Prompt):
     db = SessionLocal()
 
     try:
+        import os
+        from openai import OpenAI
+
         api_key = os.getenv("OPENAI_API_KEY")
+
+        if not api_key:
+            raise Exception("Missing API key")
+
         client = OpenAI(api_key=api_key)
 
         response = client.chat.completions.create(
             model="gpt-4o-mini",
             messages=[
-{"role": "system", "content": """You are a startup builder AI.
-
-Create a full startup plan with:
-- Startup Name
-- Idea Description
-- Target Users
-- Key Features
-- Monetization
-- Tech Stack
-- MVP Steps
-
-Make it clear and structured."""}
- {"role": "user", "content": data.prompt}
+                {"role": "system", "content": "You are a startup builder AI. Generate a structured startup plan."},
+                {"role": "user", "content": data.prompt}
             ]
         )
 
