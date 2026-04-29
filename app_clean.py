@@ -1,3 +1,4 @@
+import os
 from openai import OpenAI
 client = OpenAI()
 from fastapi import FastAPI
@@ -42,14 +43,21 @@ def agent(data: Prompt):
     db = SessionLocal()
 
     try:
+        api_key = os.getenv("OPENAI_API_KEY")
+
+        if not api_key:
+            raise Exception("API key missing")
+
+        client = OpenAI(api_key=api_key)
+
         response = client.chat.completions.create(
-            model="gpt-4.1-mini",
+            model="gpt-4o-mini",
             messages=[
                 {
                     "role": "system",
                     "content": """You are a startup builder AI.
 
-Generate a FULL startup plan with:
+Generate:
 - Startup Name
 - Idea Description
 - Target Users
@@ -68,13 +76,13 @@ Generate a FULL startup plan with:
         result = response.choices[0].message.content
 
     except Exception as e:
-        result = "ERROR: " + str(e)
+        result = "AI unavailable: " + str(e)
 
     new_item = Item(name=data.prompt, price=0)
     db.add(new_item)
     db.commit()
 
-    return {"result": result}r
+    return {"result": result}
 @app.get("/ideas")
 def get_ideas():
     db = SessionLocal()
