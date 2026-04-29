@@ -1,6 +1,5 @@
 import os
 from openai import OpenAI
-client = OpenAI()
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
@@ -37,46 +36,27 @@ class Prompt(BaseModel):
     prompt: str
 class UserCreate(BaseModel):
     username: str
-    password: st
+    password: str
 @app.post("/agent")
 def agent(data: Prompt):
     db = SessionLocal()
 
     try:
         api_key = os.getenv("OPENAI_API_KEY")
-
-        if not api_key:
-            raise Exception("API key missing")
-
         client = OpenAI(api_key=api_key)
 
         response = client.chat.completions.create(
             model="gpt-4o-mini",
             messages=[
-                {
-                    "role": "system",
-                    "content": """You are a startup builder AI.
-
-Generate:
-- Startup Name
-- Idea Description
-- Target Users
-- Features
-- Monetization
-- Tech Stack
-- MVP Plan"""
-                },
-                {
-                    "role": "user",
-                    "content": data.prompt
-                }
+                {"role": "system", "content": "You are a startup idea generator."},
+                {"role": "user", "content": data.prompt}
             ]
         )
 
         result = response.choices[0].message.content
 
     except Exception as e:
-        result = "AI unavailable: " + str(e)
+        result = "AI error: " + str(e)
 
     new_item = Item(name=data.prompt, price=0)
     db.add(new_item)
