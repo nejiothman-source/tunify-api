@@ -48,8 +48,19 @@ def agent(data: Prompt):
         response = client.chat.completions.create(
             model="gpt-4o-mini",
             messages=[
-                {"role": "system", "content": "You are a startup idea generator."},
-                {"role": "user", "content": data.prompt}
+{"role": "system", "content": """You are a startup builder AI.
+
+Create a full startup plan with:
+- Startup Name
+- Idea Description
+- Target Users
+- Key Features
+- Monetization
+- Tech Stack
+- MVP Steps
+
+Make it clear and structured."""}
+ {"role": "user", "content": data.prompt}
             ]
         )
 
